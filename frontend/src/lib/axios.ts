@@ -1,10 +1,11 @@
 import axios, { type AxiosError, type InternalAxiosRequestConfig } from "axios";
 import { useAuthStore } from "@/features/auth/useAuthStore";
 
-const API_BASE_URL = "http://localhost:5000/api";
+const API_BASE_URL =
+  import.meta.env.VITE_API_BASE_URL ?? "http://localhost:5000";
 
 export const axiosInstance = axios.create({
-  baseURL: API_BASE_URL,
+  baseURL: `${API_BASE_URL}/api`,
   withCredentials: true,
   headers: {
     "Content-Type": "application/json",
@@ -27,7 +28,9 @@ axiosInstance.interceptors.request.use(
   },
   (error) => Promise.reject(error),
 );
+
 let isRefreshing = false;
+
 let refreshSubscribers: Array<{
   resolve: (token: string) => void;
   reject: (err: unknown) => void;
@@ -49,6 +52,7 @@ const rejectSubscribers = (err: unknown) => {
   refreshSubscribers.forEach((s) => s.reject(err));
   refreshSubscribers = [];
 };
+
 const logout = () => {
   const auth = useAuthStore.getState();
 
@@ -99,6 +103,7 @@ axiosInstance.interceptors.response.use(
         }, reject);
       });
     }
+
     isRefreshing = true;
 
     try {
@@ -125,11 +130,11 @@ axiosInstance.interceptors.response.use(
 
       return axiosInstance(originalRequest);
     } catch (err) {
+      rejectSubscribers(err);
       logout();
       return Promise.reject(err);
     } finally {
       isRefreshing = false;
-      refreshSubscribers = [];
     }
   },
 );

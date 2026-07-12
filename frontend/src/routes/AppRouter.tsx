@@ -52,8 +52,6 @@ const RolesPermissionsPage = lazy(
 
 const AuditLogPage = lazy(() => import("@/features/admin/AuditLogPage"));
 
-const APPROVER_ROLES = ["Department Manager"] as const;
-
 const EMPLOYEE_ROLES = [
   "Employee",
   "Department Manager",

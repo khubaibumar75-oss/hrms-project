@@ -189,12 +189,14 @@ function ReviewAnswerForm({
   const saveDraft = useSaveReviewDraft(reviewId);
   const submitReview = useSubmitReview(reviewId, cycleId);
 
-  const { control, handleSubmit, watch, reset } =
-    useForm<ReviewDraftFormValues>({
-      resolver: zodResolver(reviewDraftSchema),
-      defaultValues: { answers: [] },
-    });
-
+  const { control, handleSubmit, watch, reset } = useForm<
+    ReviewDraftFormValues,
+    any,
+    ReviewDraftFormValues
+  >({
+    resolver: zodResolver(reviewDraftSchema),
+    defaultValues: { answers: [] },
+  });
   const { fields } = useFieldArray({ control, name: "answers" });
   const watchedAnswers = watch("answers");
 
@@ -267,7 +269,7 @@ function ReviewAnswerForm({
                 name={`answers.${idx}.rating`}
                 render={({ field: f }) => (
                   <RatingInput
-                    value={f.value}
+                    value={Number(f.value)}
                     onChange={f.onChange}
                     disabled={isLocked}
                   />
@@ -293,14 +295,18 @@ function ReviewAnswerForm({
             <Button
               type="button"
               variant="outline"
-              onClick={handleSubmit((values) => saveDraft.mutate(values))}
+              onClick={handleSubmit((values: ReviewDraftFormValues) =>
+                saveDraft.mutate(values),
+              )}
               disabled={saveDraft.isPending}
             >
               Save Draft
             </Button>
             <Button
               type="button"
-              onClick={handleSubmit((values) => submitReview.mutate(values))}
+              onClick={handleSubmit((values: ReviewDraftFormValues) =>
+                submitReview.mutate(values),
+              )}
               disabled={submitReview.isPending}
             >
               Submit Review
