@@ -10,17 +10,11 @@ async function startServer() {
   try {
     await sequelize.authenticate();
     console.log("Database connected successfully");
-
-    app.listen(PORT, () => {
-      console.log(`Server running on http://localhost:${PORT}`);
-    });
   } catch (error) {
-    console.error("Unable to connect to the database:", error);
+    console.error("Database connection failed:", error);
   }
 }
 
-if (process.env.NODE_ENV !== "production") {
-  startServer();
-}
+startServer();
 
 export default app;
