@@ -1,0 +1,10 @@
+{
+  "reviewCycleId": "f7d88bf0-de08-4369-b608-15e69587f07c",
+  "name": "Standard Performance Template",
+  "description": "Quarterly evaluation across core competencies",
+  "questions": [
+    { "questionText": "Demonstrates strong technical skills", "weight": 2.0 },
+    { "questionText": "Communicates effectively with the team", "weight": 1.5 },
+    { "questionText": "Meets deadlines consistently", "weight": 1.0 }
+  ]
+}

@@ -1,0 +1,12 @@
+{
+  "email": "newhire6@hrms.test",
+  "fullName": "Taylor Newhire",
+  "roleId": "237fe382-749d-4b08-978f-88d8bb6f3bb7",
+  "employeeCode": "EMP-009",
+  "designation": "Junior Developer",
+  "employmentType": "Full-time",
+  "joiningDate": "2026-07-01",
+  "departmentId": null,
+  "teamId": null,
+  "managerId": null
+}
