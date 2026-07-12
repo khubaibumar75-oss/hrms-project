@@ -23,10 +23,15 @@ app.use(
     origin: (origin, callback) => {
       const allowedOrigins = [
         "http://localhost:5173",
+
+        // Production frontend
+        "https://hrms-frontend-5empx56or-khubaibumar75-oss-projects.vercel.app",
+
+        // Environment variable fallback
         process.env.FRONTEND_URL,
       ].filter(Boolean);
 
-      // Allow requests without an Origin header (Postman, curl, server-to-server)
+      // Allow requests without origin (Postman, curl, server-to-server)
       if (!origin) {
         return callback(null, true);
       }
@@ -35,16 +40,24 @@ app.use(
         return callback(null, true);
       }
 
-      return callback(new Error(`CORS: Origin ${origin} is not allowed.`));
+      console.log("Blocked CORS origin:", origin);
+
+      // Do not throw error, just reject origin
+      return callback(null, false);
     },
+
     credentials: true,
+
     methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
+
     allowedHeaders: ["Content-Type", "Authorization"],
   }),
 );
 
 app.use(express.json());
+
 app.use(cookieParser());
+
 app.use(morgan("dev"));
 
 app.get("/health", (req, res) => {
@@ -57,13 +70,21 @@ app.get("/health", (req, res) => {
 
 // Routes
 app.use("/api/auth", authRoutes);
+
 app.use("/api/attendance", attendanceRoutes);
+
 app.use("/api/leave", leaveRoutes);
+
 app.use("/api/goals", goalRoutes);
+
 app.use("/api/reviews", reviewRoutes);
+
 app.use("/api/onboarding", onboardingRoutes);
+
 app.use("/api/notifications", notificationRoutes);
+
 app.use("/api/dashboard", dashboardRoutes);
+
 app.use("/api/employees", employeeRoutes);
 
 // 404 Handler
