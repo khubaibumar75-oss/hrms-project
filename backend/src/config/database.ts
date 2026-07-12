@@ -1,4 +1,4 @@
-import { CharDataType, Sequelize } from "sequelize";
+import { Sequelize } from "sequelize";
 import dotenv from "dotenv";
 
 dotenv.config();
@@ -12,7 +12,14 @@ const sequelize = new Sequelize(
     port: Number(process.env.DB_PORT),
     dialect: "postgres",
     logging: false,
-  }
+
+    dialectOptions: {
+      ssl: {
+        require: true,
+        rejectUnauthorized: false,
+      },
+    },
+  },
 );
 
 export default sequelize;

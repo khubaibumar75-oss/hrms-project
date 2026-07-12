@@ -9,4 +9,3 @@
 - [x] Prevent DashboardPage crash when `useDashboardSummary()` fails or returns undefined data.
 - [x] Fixed broken named exports for leave feature by implementing missing hooks in `frontend/src/features/leave/leaveApi.ts`.
 - [ ] Verify leave endpoints exist in backend (`/leave/balances`, `/leave/types`, `/leave/requests`) since console shows 404s.
-
