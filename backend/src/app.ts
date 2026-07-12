@@ -20,19 +20,39 @@ app.use(helmet());
 
 app.use(
   cors({
-    origin: ["http://localhost:5173", process.env.FRONTEND_URL as string],
+    origin: (origin, callback) => {
+      const allowedOrigins = [
+        "http://localhost:5173",
+        process.env.FRONTEND_URL,
+      ].filter(Boolean);
+
+      // Allow requests without an Origin header (Postman, curl, server-to-server)
+      if (!origin) {
+        return callback(null, true);
+      }
+
+      if (allowedOrigins.includes(origin)) {
+        return callback(null, true);
+      }
+
+      return callback(new Error(`CORS: Origin ${origin} is not allowed.`));
+    },
     credentials: true,
     methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
     allowedHeaders: ["Content-Type", "Authorization"],
-    exposedHeaders: ["Set-Cookie"],
   }),
 );
+
 app.use(express.json());
 app.use(cookieParser());
 app.use(morgan("dev"));
 
 app.get("/health", (req, res) => {
-  res.json({ status: "ok" });
+  res.status(200).json({
+    success: true,
+    status: "ok",
+    message: "HRMS Backend is running",
+  });
 });
 
 // Routes
@@ -44,8 +64,14 @@ app.use("/api/reviews", reviewRoutes);
 app.use("/api/onboarding", onboardingRoutes);
 app.use("/api/notifications", notificationRoutes);
 app.use("/api/dashboard", dashboardRoutes);
-
-// Employee Management Routes
 app.use("/api/employees", employeeRoutes);
+
+// 404 Handler
+app.use((req, res) => {
+  res.status(404).json({
+    success: false,
+    message: "Route not found",
+  });
+});
 
 export default app;
