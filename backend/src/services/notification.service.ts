@@ -5,8 +5,8 @@ export async function getMyNotifications(userId: string) {
   const notifications = await Notification.findAll({
     where: { user_id: userId },
     order: [
-      ["is_read", "ASC"],    // unread first
-      ["created_at", "DESC"], // newest first within each group
+      ["is_read", "ASC"],
+      ["created_at", "DESC"],
     ],
   });
 
@@ -21,7 +21,10 @@ export async function markAsRead(userId: string, notificationId: string) {
   }
 
   if (notification.get("user_id") !== userId) {
-    throw { status: 403, message: "You can only mark your own notifications as read" };
+    throw {
+      status: 403,
+      message: "You can only mark your own notifications as read",
+    };
   }
 
   await notification.update({ is_read: true });
@@ -31,7 +34,7 @@ export async function markAsRead(userId: string, notificationId: string) {
 export async function markAllAsRead(userId: string) {
   await Notification.update(
     { is_read: true },
-    { where: { user_id: userId, is_read: false } }
+    { where: { user_id: userId, is_read: false } },
   );
 
   return { message: "All notifications marked as read" };

@@ -100,8 +100,6 @@ export default function AppRouter() {
     <BrowserRouter>
       <Suspense fallback={<RouteFallback />}>
         <Routes>
-          {/* Public */}
-
           <Route path="/login" element={<LoginPage />} />
 
           <Route path="/activate" element={<ActivateAccountPage />} />
@@ -136,8 +134,6 @@ export default function AppRouter() {
                 />
               </Route>
 
-              {/* HR final approval */}
-
               <Route
                 element={
                   <ProtectedRoute
@@ -159,8 +155,6 @@ export default function AppRouter() {
 
                 <Route path="/audit-log" element={<AuditLogPage />} />
               </Route>
-
-              {/* Admin */}
 
               <Route
                 element={<ProtectedRoute allowedRoles={["Super Admin"]} />}

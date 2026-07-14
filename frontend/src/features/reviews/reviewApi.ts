@@ -1,7 +1,10 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { axiosInstance } from "@/lib/axios";
 import type { ApiResponse, Review, ReviewCycle, ReviewTemplate } from "@/types";
-import type { ReviewDraftFormValues, ReviewSubmissionFormValues } from "@/schemas/review.schema";
+import type {
+  ReviewDraftFormValues,
+  ReviewSubmissionFormValues,
+} from "@/schemas/review.schema";
 
 export interface ReviewWithMeta extends Review {
   reviewee_name?: string;
@@ -11,15 +14,18 @@ export interface ReviewWithMeta extends Review {
 export const reviewKeys = {
   all: ["reviews"] as const,
   cycles: () => [...reviewKeys.all, "cycles"] as const,
-  myReviews: (cycleId: string) => [...reviewKeys.all, "my-reviews", cycleId] as const,
-  detail: (reviewId: string) => [...reviewKeys.all, "detail", reviewId] as const,
+  myReviews: (cycleId: string) =>
+    [...reviewKeys.all, "my-reviews", cycleId] as const,
+  detail: (reviewId: string) =>
+    [...reviewKeys.all, "detail", reviewId] as const,
 };
 
 export function useReviewCycles() {
   return useQuery({
     queryKey: reviewKeys.cycles(),
     queryFn: async () => {
-      const { data } = await axiosInstance.get<ApiResponse<ReviewCycle[]>>("/reviews/cycles");
+      const { data } =
+        await axiosInstance.get<ApiResponse<ReviewCycle[]>>("/reviews/cycles");
       return data.data;
     },
   });
@@ -30,7 +36,7 @@ export function useMyReviews(cycleId: string | undefined) {
     queryKey: reviewKeys.myReviews(cycleId ?? ""),
     queryFn: async () => {
       const { data } = await axiosInstance.get<ApiResponse<ReviewWithMeta[]>>(
-        `/reviews/cycles/${cycleId}/my-reviews`
+        `/reviews/cycles/${cycleId}/my-reviews`,
       );
       return data.data;
     },
@@ -42,7 +48,9 @@ export function useReview(reviewId: string | undefined) {
   return useQuery({
     queryKey: reviewKeys.detail(reviewId ?? ""),
     queryFn: async () => {
-      const { data } = await axiosInstance.get<ApiResponse<ReviewWithMeta>>(`/reviews/${reviewId}`);
+      const { data } = await axiosInstance.get<ApiResponse<ReviewWithMeta>>(
+        `/reviews/${reviewId}`,
+      );
       return data.data;
     },
     enabled: !!reviewId,
@@ -55,7 +63,7 @@ export function useSaveReviewDraft(reviewId: string) {
     mutationFn: async (values: ReviewDraftFormValues) => {
       const { data } = await axiosInstance.patch<ApiResponse<Review>>(
         `/reviews/${reviewId}/draft`,
-        values
+        values,
       );
       return data.data;
     },
@@ -71,13 +79,15 @@ export function useSubmitReview(reviewId: string, cycleId: string) {
     mutationFn: async (values: ReviewSubmissionFormValues) => {
       const { data } = await axiosInstance.post<ApiResponse<Review>>(
         `/reviews/${reviewId}/submit`,
-        values
+        values,
       );
       return data.data;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: reviewKeys.detail(reviewId) });
-      queryClient.invalidateQueries({ queryKey: reviewKeys.myReviews(cycleId) });
+      queryClient.invalidateQueries({
+        queryKey: reviewKeys.myReviews(cycleId),
+      });
     },
   });
 }

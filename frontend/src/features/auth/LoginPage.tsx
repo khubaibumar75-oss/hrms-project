@@ -31,7 +31,8 @@ export default function LoginPage() {
     formState: { errors },
   } = useForm<LoginFormValues>({ resolver: zodResolver(loginSchema) });
 
-  const redirectTo = (location.state as { from?: string })?.from ?? "/dashboard";
+  const redirectTo =
+    (location.state as { from?: string })?.from ?? "/dashboard";
 
   const onSubmit = (values: LoginFormValues) => {
     loginMutation.mutate(values, {
@@ -52,7 +53,9 @@ export default function LoginPage() {
           <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-accent font-display text-lg font-bold text-accent-foreground">
             H
           </div>
-          <span className="font-display text-lg font-semibold tracking-tight">HRMS</span>
+          <span className="font-display text-lg font-semibold tracking-tight">
+            HRMS
+          </span>
         </div>
 
         <div className="max-w-sm">
@@ -60,12 +63,11 @@ export default function LoginPage() {
             Every review, every hour, every chain of command — one record.
           </h1>
           <p className="mt-4 text-sm leading-relaxed text-primary-foreground/70">
-            Attendance, leave, goals, and performance reviews, tracked
-            against a single source of truth for who reports to whom.
+            Attendance, leave, goals, and performance reviews, tracked against a
+            single source of truth for who reports to whom.
           </p>
         </div>
 
-        {/* signature motif: org-chart connector, echoed from the sidebar */}
         <svg
           className="pointer-events-none absolute -bottom-10 -right-10 h-64 w-64 text-primary-foreground/10"
           viewBox="0 0 200 200"
@@ -104,7 +106,11 @@ export default function LoginPage() {
             Enter your work email and password to continue.
           </p>
 
-          <form onSubmit={handleSubmit(onSubmit)} className="mt-8 space-y-4" noValidate>
+          <form
+            onSubmit={handleSubmit(onSubmit)}
+            className="mt-8 space-y-4"
+            noValidate
+          >
             <div className="space-y-1.5">
               <Label htmlFor="email">Work email</Label>
               <Input
@@ -116,7 +122,9 @@ export default function LoginPage() {
                 {...register("email")}
               />
               {errors.email && (
-                <p className="text-xs text-destructive">{errors.email.message}</p>
+                <p className="text-xs text-destructive">
+                  {errors.email.message}
+                </p>
               )}
             </div>
 
@@ -139,11 +147,17 @@ export default function LoginPage() {
                   tabIndex={-1}
                   aria-label={showPassword ? "Hide password" : "Show password"}
                 >
-                  {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                  {showPassword ? (
+                    <EyeOff className="h-4 w-4" />
+                  ) : (
+                    <Eye className="h-4 w-4" />
+                  )}
                 </button>
               </div>
               {errors.password && (
-                <p className="text-xs text-destructive">{errors.password.message}</p>
+                <p className="text-xs text-destructive">
+                  {errors.password.message}
+                </p>
               )}
             </div>
 
@@ -157,7 +171,11 @@ export default function LoginPage() {
               </div>
             )}
 
-            <Button type="submit" className="w-full" disabled={loginMutation.isPending}>
+            <Button
+              type="submit"
+              className="w-full"
+              disabled={loginMutation.isPending}
+            >
               {loginMutation.isPending ? (
                 <>
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />

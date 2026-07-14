@@ -16,7 +16,6 @@ export const reviewSubmissionSchema = z.object({
     .min(1, "This review has no questions to answer"),
 });
 
-// Looser variant for "Save Draft" — allows unrated (0) questions so partial progress persists
 export const reviewDraftSchema = z.object({
   answers: z.array(
     z.object({

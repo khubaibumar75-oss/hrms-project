@@ -48,9 +48,9 @@ export function initAuditLogModel(sequelize: Sequelize) {
       tableName: "AUDIT_LOGS",
       underscored: true,
       timestamps: true,
-      updatedAt: false, // immutable — no updated_at
+      updatedAt: false,
       createdAt: "created_at",
-    }
+    },
   );
 
   return AuditLog;

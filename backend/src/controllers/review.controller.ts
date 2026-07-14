@@ -8,9 +8,7 @@ import {
   submitReview,
   getOverallScore,
 } from "../services/review.service";
-import {
-  getMyReviews,
-} from "../services/review.service";
+import { getMyReviews } from "../services/review.service";
 
 export async function handleGetCycles(req: AuthRequest, res: Response) {
   try {
@@ -27,7 +25,12 @@ export async function handleGetCycles(req: AuthRequest, res: Response) {
 export async function handleCreateCycle(req: AuthRequest, res: Response) {
   try {
     const { name, startDate, endDate } = req.body;
-    const cycle = await createReviewCycle(req.user!.userId, name, startDate, endDate);
+    const cycle = await createReviewCycle(
+      req.user!.userId,
+      name,
+      startDate,
+      endDate,
+    );
     res.status(201).json({ success: true, data: cycle });
   } catch (error: any) {
     res.status(error.status || 500).json({
@@ -40,7 +43,12 @@ export async function handleCreateCycle(req: AuthRequest, res: Response) {
 export async function handleCreateTemplate(req: AuthRequest, res: Response) {
   try {
     const { reviewCycleId, name, description, questions } = req.body;
-    const result = await createReviewTemplate(reviewCycleId, name, description, questions);
+    const result = await createReviewTemplate(
+      reviewCycleId,
+      name,
+      description,
+      questions,
+    );
     res.status(201).json({ success: true, data: result });
   } catch (error: any) {
     res.status(error.status || 500).json({
@@ -91,17 +99,11 @@ export async function handleGetOverallScore(req: AuthRequest, res: Response) {
     });
   }
 }
-export async function handleGetMyReviews(
-  req: AuthRequest,
-  res: Response
-) {
+export async function handleGetMyReviews(req: AuthRequest, res: Response) {
   try {
     const cycleId = req.params.cycleId as string;
 
-    const reviews = await getMyReviews(
-      req.user!.userId,
-      cycleId
-    );
+    const reviews = await getMyReviews(req.user!.userId, cycleId);
 
     res.status(200).json({
       success: true,

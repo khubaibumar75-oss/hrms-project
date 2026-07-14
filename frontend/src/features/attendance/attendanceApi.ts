@@ -92,7 +92,6 @@ function useAttendanceAction(mutationFn: () => Promise<Attendance>) {
     mutationFn,
 
     onSuccess: () => {
-      // Refetch today's attendance after every action
       queryClient.invalidateQueries({
         queryKey: QUERY_KEYS.today,
       });

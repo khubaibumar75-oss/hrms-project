@@ -230,7 +230,6 @@ function ReviewAnswerForm({
 
   if (isLoading || !review || !review.template?.questions) return <Loader />;
 
-  // Only Pending is editable — Submitted/Published are read-only per your Review type
   const isLocked = review.status !== "Pending";
 
   return (

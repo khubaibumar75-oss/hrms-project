@@ -52,9 +52,6 @@ function statusPillClass(status: ReviewCycleStatus) {
   }
 }
 
-// Encodes the cycle's one-way lifecycle (SRS §2.5): Draft → Active fans out
-// Self/Peer/Manager reviews; Closed locks submissions; Published computes
-// and reveals the weighted scores.
 const NEXT_STATUS: Record<
   ReviewCycleStatus,
   { next: ReviewCycleStatus; label: string; description: string } | null
@@ -79,8 +76,6 @@ const NEXT_STATUS: Record<
   },
   Published: null,
 };
-
-// ── Templates tab ────────────────────────────────────────────────────────
 
 function NewTemplateDialog({
   open,
@@ -291,8 +286,6 @@ function TemplatesTab() {
     </div>
   );
 }
-
-// ── Cycles tab ───────────────────────────────────────────────────────────
 
 function NewCycleDialog({
   open,

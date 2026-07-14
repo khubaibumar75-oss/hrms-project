@@ -64,11 +64,9 @@
   --muted: hsl(210 20% 95%);
   --muted-foreground: hsl(215 15% 45%);
 
-  /* Accent: warm amber, used sparingly for achievement/attention */
   --accent: hsl(38 75% 51%);
   --accent-foreground: hsl(30 40% 12%);
 
-  /* Status vocabulary — shared across Attendance / Leave / Goals / Reviews */
   --success: hsl(152 45% 32%);
   --success-foreground: hsl(150 40% 96%);
   --warning: hsl(38 80% 45%);
@@ -82,7 +80,6 @@
   --input: hsl(214 20% 89%);
   --ring: hsl(178 40% 30%);
 
-  /* Sidebar reads slightly darker than page background — grounds the nav */
   --sidebar: hsl(178 35% 13%);
   --sidebar-foreground: hsl(160 15% 88%);
   --sidebar-border: hsl(178 30% 20%);
@@ -108,8 +105,6 @@
 }
 
 @layer utilities {
-  /* Signature motif: thin left "reporting line" — used on active nav items
-     and cards tied to org hierarchy (manager chains, review chains, etc.) */
   .reporting-line {
     position: relative;
   }
@@ -124,8 +119,6 @@
     background: var(--accent);
   }
 
-  /* Status pills shared by Attendance/Leave/Goals/Reviews so status always
-     looks & reads the same way across the whole app */
   .status-pill {
     @apply inline-flex items-center gap-1.5 rounded-full px-2.5 py-0.5 text-xs font-medium;
   }

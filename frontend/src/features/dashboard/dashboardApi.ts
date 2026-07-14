@@ -7,7 +7,7 @@ export interface EmployeeDashboardSummary {
   attendance: {
     weeklyHours: number;
     weeklyTargetHours: number;
-    daily: { date: string; hours: number }[]; // last 7 days
+    daily: { date: string; hours: number }[];
   };
   leaveBalances: { leave_type: string; remaining_days: number }[];
   goalsByStatus: { status: GoalStatus; count: number }[];
@@ -18,15 +18,25 @@ export interface ManagerDashboardSummary {
   scope: "manager";
   teamSize: number;
   pendingApprovalsCount: number;
-  attendanceTrend: { date: string; present: number; late: number; absent: number }[];
+  attendanceTrend: {
+    date: string;
+    present: number;
+    late: number;
+    absent: number;
+  }[];
   goalsByStatus: { status: GoalStatus; count: number }[];
   reviewCycles: { id: string; name: string; completionPercent: number }[];
 }
 
-export type DashboardSummary = EmployeeDashboardSummary | ManagerDashboardSummary;
+export type DashboardSummary =
+  | EmployeeDashboardSummary
+  | ManagerDashboardSummary;
 
 async function fetchSummary() {
-  const { data } = await axiosInstance.get<ApiResponse<DashboardSummary>>("/dashboard/summary");
+  const { data } =
+    await axiosInstance.get<ApiResponse<DashboardSummary>>(
+      "/dashboard/summary",
+    );
   return data.data;
 }
 

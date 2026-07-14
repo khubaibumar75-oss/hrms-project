@@ -1,7 +1,10 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { axiosInstance } from "@/lib/axios";
 import type { ApiResponse, Goal } from "@/types";
-import type { CreateGoalFormValues, GoalProgressFormValues } from "@/schemas/goal.schema";
+import type {
+  CreateGoalFormValues,
+  GoalProgressFormValues,
+} from "@/schemas/goal.schema";
 
 export interface TeamMemberOption {
   id: string; // employee id
@@ -20,22 +23,43 @@ async function fetchGoals() {
 }
 
 async function fetchMyTeam() {
-  const { data } = await axiosInstance.get<ApiResponse<TeamMemberOption[]>>("/employees/my-team");
+  const { data } =
+    await axiosInstance.get<ApiResponse<TeamMemberOption[]>>(
+      "/employees/my-team",
+    );
   return data.data;
 }
 
 async function createGoal(payload: CreateGoalFormValues) {
-  const { data } = await axiosInstance.post<ApiResponse<Goal>>("/goals", payload);
+  const { data } = await axiosInstance.post<ApiResponse<Goal>>(
+    "/goals",
+    payload,
+  );
   return data.data;
 }
 
-async function updateProgress({ id, ...payload }: GoalProgressFormValues & { id: string }) {
-  const { data } = await axiosInstance.patch<ApiResponse<Goal>>(`/goals/${id}/progress`, payload);
+async function updateProgress({
+  id,
+  ...payload
+}: GoalProgressFormValues & { id: string }) {
+  const { data } = await axiosInstance.patch<ApiResponse<Goal>>(
+    `/goals/${id}/progress`,
+    payload,
+  );
   return data.data;
 }
 
-async function validateGoal({ id, approved }: { id: string; approved: boolean }) {
-  const { data } = await axiosInstance.post<ApiResponse<Goal>>(`/goals/${id}/validate`, { approved });
+async function validateGoal({
+  id,
+  approved,
+}: {
+  id: string;
+  approved: boolean;
+}) {
+  const { data } = await axiosInstance.post<ApiResponse<Goal>>(
+    `/goals/${id}/validate`,
+    { approved },
+  );
   return data.data;
 }
 
@@ -43,9 +67,13 @@ export function useGoals() {
   return useQuery({ queryKey: KEYS.list, queryFn: fetchGoals });
 }
 
-/** Manager-only: populates the "assign to" dropdown when creating a goal. */
 export function useMyTeam(enabled: boolean) {
-  return useQuery({ queryKey: KEYS.myTeam, queryFn: fetchMyTeam, enabled, staleTime: 1000 * 60 * 5 });
+  return useQuery({
+    queryKey: KEYS.myTeam,
+    queryFn: fetchMyTeam,
+    enabled,
+    staleTime: 1000 * 60 * 5,
+  });
 }
 
 export function useCreateGoal() {

@@ -113,6 +113,10 @@ async function createLeaveRequestRequest(payload: LeaveRequestFormValues) {
       startDate: payload.start_date,
       endDate: payload.end_date,
       reason: payload.reason,
+
+      // New fields
+      isScheduled: payload.isScheduled ?? false,
+      scheduledAt: payload.scheduled_at || null,
     },
   );
 

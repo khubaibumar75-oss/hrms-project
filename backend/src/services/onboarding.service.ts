@@ -13,7 +13,7 @@ export async function initiateOnboarding(
   joiningDate: string,
   departmentId: string | null,
   teamId: string | null,
-  managerId: string | null
+  managerId: string | null,
 ) {
   const existing = await User.findOne({ where: { email } });
   if (existing) {
@@ -26,9 +26,7 @@ export async function initiateOnboarding(
   }
 
   const token = generateVerificationToken();
-  const expires = new Date(Date.now() + 24 * 60 * 60 * 1000); // 24 hours
-
-  // Temporary placeholder password hash — overwritten when candidate sets their real password
+  const expires = new Date(Date.now() + 24 * 60 * 60 * 1000);
   const placeholderHash = await hashPassword(token);
 
   const user = await User.create({
@@ -57,12 +55,11 @@ export async function initiateOnboarding(
 
   const verificationLink = `http://localhost:5173/activate?token=${token}`;
 
-// Don't block the response on email delivery — log and continue if it fails
-sendVerificationEmail(email, fullName, verificationLink).catch((err) => {
-  console.error("Failed to send verification email:", err.message);
-});
+  sendVerificationEmail(email, fullName, verificationLink).catch((err) => {
+    console.error("Failed to send verification email:", err.message);
+  });
 
-return { user, employee, verificationLink };
+  return { user, employee, verificationLink };
 }
 
 export async function verifyAndSetPassword(token: string, newPassword: string) {
@@ -92,8 +89,9 @@ export async function verifyAndSetPassword(token: string, newPassword: string) {
     verification_token_expires: null,
   });
 
-  // Also activate the employee record
-  const employee = await Employee.findOne({ where: { user_id: user.get("id") } });
+  const employee = await Employee.findOne({
+    where: { user_id: user.get("id") },
+  });
   if (employee) {
     await employee.update({ status: "Active" });
   }

@@ -1,5 +1,3 @@
-// ── Shared enums (mirrors backend VARCHAR status columns) ──────────────────
-
 export type EmploymentType =
   | "Full-time"
   | "Part-time"
@@ -21,11 +19,9 @@ export type RoleName =
   | "Department Manager"
   | "Employee";
 
-// ── Auth / RBAC ──────────────────────────────────────────────────────────
-
 export interface Permission {
   id: string;
-  name: string; // e.g. 'leave:approve'
+  name: string;
   module: string;
   action: "CREATE" | "READ" | "UPDATE" | "DELETE";
 }
@@ -56,8 +52,6 @@ export interface User {
   created_at?: string;
   updated_at?: string;
 }
-
-// ── Org structure ────────────────────────────────────────────────────────
 
 export interface Department {
   id: string;
@@ -91,8 +85,6 @@ export interface Employee {
   status: EmployeeStatus;
 }
 
-// ── Attendance ───────────────────────────────────────────────────────────
-
 export interface AttendanceBreak {
   id: string;
   attendance_id: string;
@@ -111,8 +103,6 @@ export interface Attendance {
   total_hours: number | null;
   breaks?: AttendanceBreak[];
 }
-
-// ── Leave ────────────────────────────────────────────────────────────────
 
 export interface LeaveType {
   id: string;
@@ -169,8 +159,6 @@ export interface LeaveRequest {
   };
 }
 
-// ── Goals ────────────────────────────────────────────────────────────────
-
 export interface Goal {
   id: string;
   employee_id: string;
@@ -183,8 +171,6 @@ export interface Goal {
   created_at: string;
   updated_at: string;
 }
-
-// ── Performance Reviews ──────────────────────────────────────────────────
 
 export interface ReviewCycle {
   id: string;
@@ -250,8 +236,6 @@ export interface AuditLog {
   created_at: string;
 }
 
-// ── API envelope shapes ──────────────────────────────────────────────────
-
 export interface ApiResponse<T> {
   success: boolean;
   message?: string;
@@ -274,7 +258,6 @@ export interface ApiError {
   message: string;
   errors?: Record<string, string[]>;
 }
-// ── Dashboard ────────────────────────────────────────────────────────────
 
 export interface DashboardKpis {
   total_employees: number;

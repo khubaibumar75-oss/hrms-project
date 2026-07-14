@@ -3,10 +3,7 @@ import { logAudit } from "../utils/auditLogger.util";
 
 export async function getGoals() {
   return Goal.findAll({
-    include: [
-      { model: Employee },
-      { model: User, as: "creator" },
-    ],
+    include: [{ model: Employee }, { model: User, as: "creator" }],
     order: [["created_at", "DESC"]],
   });
 }
@@ -16,9 +13,11 @@ export async function createGoal(
   employeeId: string,
   title: string,
   description: string,
-  targetDate: string
+  targetDate: string,
 ) {
-  const managerEmployee = await Employee.findOne({ where: { user_id: managerUserId } });
+  const managerEmployee = await Employee.findOne({
+    where: { user_id: managerUserId },
+  });
   if (!managerEmployee) {
     throw { status: 404, message: "Manager employee profile not found" };
   }
@@ -29,7 +28,10 @@ export async function createGoal(
   }
 
   if (targetEmployee.get("manager_id") !== managerEmployee.get("id")) {
-    throw { status: 403, message: "You can only set goals for your direct reports" };
+    throw {
+      status: 403,
+      message: "You can only set goals for your direct reports",
+    };
   }
 
   const goal = await Goal.create({
@@ -49,14 +51,17 @@ export async function updateProgress(
   userId: string,
   goalId: string,
   newProgress: number,
-  comment: string
+  comment: string,
 ) {
   if (newProgress < 0 || newProgress > 100) {
     throw { status: 400, message: "Progress must be between 0 and 100" };
   }
 
   if (!comment || comment.trim().length === 0) {
-    throw { status: 400, message: "A comment is required when updating progress" };
+    throw {
+      status: 400,
+      message: "A comment is required when updating progress",
+    };
   }
 
   const employee = await Employee.findOne({ where: { user_id: userId } });
@@ -70,22 +75,27 @@ export async function updateProgress(
   }
 
   if (goal.get("employee_id") !== employee.get("id")) {
-    throw { status: 403, message: "You can only update progress on your own goals" };
+    throw {
+      status: 403,
+      message: "You can only update progress on your own goals",
+    };
   }
 
   if (goal.get("status") === "Achieved") {
-    throw { status: 400, message: "This goal has already been verified as achieved" };
+    throw {
+      status: 400,
+      message: "This goal has already been verified as achieved",
+    };
   }
 
   const previousProgress = goal.get("progress") as number;
 
   let newStatus = "In Progress";
   if (newProgress === 0) newStatus = "Not Started";
-  if (newProgress === 100) newStatus = "Achieved"; // pending manager verification, see note below
-
+  if (newProgress === 100) newStatus = "Achieved";
   await goal.update({
     progress: newProgress,
-    status: newProgress === 100 ? "In Progress" : newStatus, // hold at "In Progress" until manager verifies
+    status: newProgress === 100 ? "In Progress" : newStatus,
   });
 
   await GoalProgressLog.create({
@@ -106,11 +116,16 @@ export async function verifyGoal(managerUserId: string, goalId: string) {
   }
 
   if (goal.get("progress") !== 100) {
-    throw { status: 400, message: "Goal must reach 100% progress before it can be verified" };
+    throw {
+      status: 400,
+      message: "Goal must reach 100% progress before it can be verified",
+    };
   }
 
   const employee = goal.get("Employee") as any;
-  const managerEmployee = await Employee.findOne({ where: { user_id: managerUserId } });
+  const managerEmployee = await Employee.findOne({
+    where: { user_id: managerUserId },
+  });
 
   if (!managerEmployee || employee.manager_id !== managerEmployee.get("id")) {
     throw { status: 403, message: "You are not the manager of this employee" };

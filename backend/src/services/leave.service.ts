@@ -238,7 +238,15 @@ export async function requestLeave(
   startDate: string,
   endDate: string,
   reason: string,
+  isScheduled: boolean = false,
+  scheduledAt: string | null = null,
 ) {
+  console.log("DEBUG requestLeave:", {
+    isScheduled,
+    scheduledAt,
+    now: new Date().toISOString(),
+  });
+
   const employee = await Employee.findOne({
     where: {
       user_id: userId,
@@ -251,6 +259,7 @@ export async function requestLeave(
       message: "Employee profile not found",
     };
   }
+  // ...rest of the function stays exactly the same
 
   const daysRequested =
     (new Date(endDate).getTime() - new Date(startDate).getTime()) /
@@ -262,6 +271,31 @@ export async function requestLeave(
       status: 400,
       message: "Invalid date range",
     };
+  }
+  if (isScheduled) {
+    if (!scheduledAt) {
+      throw {
+        status: 400,
+        message: "Scheduled date is required.",
+      };
+    }
+
+    const scheduleDate = new Date(scheduledAt);
+    const leaveStart = new Date(startDate);
+
+    if (scheduleDate >= leaveStart) {
+      throw {
+        status: 400,
+        message: "Scheduled date must be before the leave start date.",
+      };
+    }
+
+    if (scheduleDate <= new Date()) {
+      throw {
+        status: 400,
+        message: "Scheduled date must be in the future.",
+      };
+    }
   }
 
   const balance = await LeaveBalance.findOne({
@@ -304,9 +338,13 @@ export async function requestLeave(
     manager_status: "Pending",
 
     hr_status: "Pending",
+
+    is_scheduled: isScheduled,
+
+    scheduled_at: isScheduled ? scheduledAt : null,
   });
 
-  if (employee.get("manager_id")) {
+  if (!isScheduled && employee.get("manager_id")) {
     const manager = await Employee.findByPk(
       employee.get("manager_id") as string,
     );
@@ -317,7 +355,7 @@ export async function requestLeave(
 
         "New Leave Request",
 
-        `An employee has submitted a leave request requiring your approval.`,
+        "An employee has submitted a leave request requiring your approval.",
 
         "LEAVE_REQUEST",
 
@@ -487,8 +525,6 @@ export async function hrReview(
     };
   }
 
-  // HR Reject
-
   if (decision === "Rejected") {
     const oldData = {
       hr_status: request.get("hr_status"),
@@ -546,8 +582,6 @@ export async function hrReview(
 
     return request;
   }
-
-  // HR APPROVE
 
   const oldBalance = await LeaveBalance.findOne({
     where: {

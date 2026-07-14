@@ -13,9 +13,7 @@ import {
 export async function getReviewCycles(userId: string) {
   const user = await User.findByPk(userId, { include: [Role] });
   const roleName = ((user?.get("Role") as any)?.name || "").toLowerCase();
-  const isAdminOrHr =
-  roleName === "super admin" ||
-  roleName === "hr manager";
+  const isAdminOrHr = roleName === "super admin" || roleName === "hr manager";
 
   if (isAdminOrHr) {
     return ReviewCycle.findAll({
@@ -46,7 +44,7 @@ export async function createReviewCycle(
   createdBy: string,
   name: string,
   startDate: string,
-  endDate: string
+  endDate: string,
 ) {
   const cycle = await ReviewCycle.create({
     name,
@@ -63,7 +61,7 @@ export async function createReviewTemplate(
   reviewCycleId: string,
   name: string,
   description: string,
-  questions: { questionText: string; weight: number }[]
+  questions: { questionText: string; weight: number }[],
 ) {
   if (!questions || questions.length === 0) {
     throw { status: 400, message: "At least one question is required" };
@@ -81,7 +79,7 @@ export async function createReviewTemplate(
         name,
         description,
       },
-      { transaction: t }
+      { transaction: t },
     );
 
     const createdQuestions = await ReviewQuestion.bulkCreate(
@@ -90,7 +88,7 @@ export async function createReviewTemplate(
         question_text: q.questionText,
         weight: q.weight,
       })),
-      { transaction: t }
+      { transaction: t },
     );
 
     return { template, questions: createdQuestions };
@@ -101,7 +99,7 @@ export async function createReviewTemplate(
 
 export async function launchReviewCycle(
   reviewCycleId: string,
-  reviewTemplateId: string
+  reviewTemplateId: string,
 ) {
   const cycle = await ReviewCycle.findByPk(reviewCycleId);
   if (!cycle) {
@@ -117,7 +115,6 @@ export async function launchReviewCycle(
     throw { status: 404, message: "Template not found for this cycle" };
   }
 
-  // Get every active employee
   const employees = await Employee.findAll({ where: { status: "Active" } });
 
   const reviewsToCreate: any[] = [];
@@ -127,7 +124,6 @@ export async function launchReviewCycle(
     const userId = employee.get("user_id") as string;
     const managerId = employee.get("manager_id") as string | null;
 
-    // Self review
     reviewsToCreate.push({
       review_cycle_id: reviewCycleId,
       review_template_id: reviewTemplateId,
@@ -136,8 +132,6 @@ export async function launchReviewCycle(
       review_type: "Self",
       status: "Pending",
     });
-
-    // Manager review (only if this employee has a manager)
     if (managerId) {
       const manager = await Employee.findByPk(managerId);
       if (manager) {
@@ -153,7 +147,6 @@ export async function launchReviewCycle(
     }
   }
 
-  // Peer reviews: pair each employee with one random colleague from the same team
   for (const employee of employees) {
     const employeeId = employee.get("id") as string;
     const teamId = employee.get("team_id") as string | null;
@@ -161,7 +154,7 @@ export async function launchReviewCycle(
     if (!teamId) continue;
 
     const peers = employees.filter(
-      (e) => e.get("team_id") === teamId && e.get("id") !== employeeId
+      (e) => e.get("team_id") === teamId && e.get("id") !== employeeId,
     );
 
     if (peers.length === 0) continue;
@@ -187,7 +180,7 @@ export async function launchReviewCycle(
 export async function submitReview(
   reviewerId: string,
   reviewId: string,
-  answers: { questionId: string; rating: number; answerText?: string }[]
+  answers: { questionId: string; rating: number; answerText?: string }[],
 ) {
   const review = await Review.findByPk(reviewId);
 
@@ -214,7 +207,7 @@ export async function submitReview(
   });
 
   const weightMap = new Map(
-    questions.map((q) => [q.get("id") as string, Number(q.get("weight"))])
+    questions.map((q) => [q.get("id") as string, Number(q.get("weight"))]),
   );
 
   const result = await sequelize.transaction(async (t) => {
@@ -225,7 +218,7 @@ export async function submitReview(
         rating: a.rating,
         answer_text: a.answerText || null,
       })),
-      { transaction: t }
+      { transaction: t },
     );
 
     let weightedSum = 0;
@@ -245,7 +238,7 @@ export async function submitReview(
         score: score.toFixed(2),
         submitted_at: new Date(),
       },
-      { transaction: t }
+      { transaction: t },
     );
 
     return review;
@@ -254,7 +247,10 @@ export async function submitReview(
   return result;
 }
 
-export async function getOverallScore(employeeId: string, reviewCycleId: string) {
+export async function getOverallScore(
+  employeeId: string,
+  reviewCycleId: string,
+) {
   const reviews = await Review.findAll({
     where: {
       employee_id: employeeId,
@@ -264,7 +260,10 @@ export async function getOverallScore(employeeId: string, reviewCycleId: string)
   });
 
   if (reviews.length === 0) {
-    throw { status: 404, message: "No submitted reviews found for this employee in this cycle" };
+    throw {
+      status: 404,
+      message: "No submitted reviews found for this employee in this cycle",
+    };
   }
 
   const scores = reviews.map((r) => ({
@@ -282,10 +281,7 @@ export async function getOverallScore(employeeId: string, reviewCycleId: string)
   };
 }
 
-export async function getMyReviews(
-  userId: string,
-  cycleId: string
-) {
+export async function getMyReviews(userId: string, cycleId: string) {
   const reviews = await Review.findAll({
     where: {
       reviewer_id: userId,

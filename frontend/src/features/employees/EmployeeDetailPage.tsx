@@ -1,5 +1,12 @@
 import { useParams, Link } from "react-router-dom";
-import { ArrowLeft, Mail, Calendar, Briefcase, Users, DollarSign } from "lucide-react";
+import {
+  ArrowLeft,
+  Mail,
+  Calendar,
+  Briefcase,
+  Users,
+  DollarSign,
+} from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import Loader from "@/components/common/Loader";
@@ -25,12 +32,9 @@ export default function EmployeeDetailPage() {
   const { data: employee, isLoading } = useEmployeeDetail(id);
   const currentUser = useAuthStore((s) => s.user);
 
-  // SRS §3.3: salary requires isolated column visibility — only render it if
-  // the backend actually sends it AND the viewer is Super Admin/HR Manager.
-  // If your API strips salary server-side for other roles already, this
-  // client-side gate is just a belt-and-suspenders extra.
   const canViewSalary =
-    currentUser?.role?.name === "Super Admin" || currentUser?.role?.name === "HR Manager";
+    currentUser?.role?.name === "Super Admin" ||
+    currentUser?.role?.name === "HR Manager";
 
   if (isLoading || !employee) return <Loader />;
 
@@ -44,8 +48,12 @@ export default function EmployeeDetailPage() {
             <ArrowLeft className="h-4 w-4" />
           </Link>
         </Button>
-        <h1 className="font-display text-2xl font-semibold text-foreground">{fullName}</h1>
-        <span className={statusPillClass(employee.status)}>{employee.status}</span>
+        <h1 className="font-display text-2xl font-semibold text-foreground">
+          {fullName}
+        </h1>
+        <span className={statusPillClass(employee.status)}>
+          {employee.status}
+        </span>
       </div>
 
       <div className="grid gap-6 md:grid-cols-3">
@@ -54,8 +62,16 @@ export default function EmployeeDetailPage() {
             <CardTitle className="font-display text-base">Profile</CardTitle>
           </CardHeader>
           <CardContent className="grid grid-cols-2 gap-4 text-sm">
-            <Field icon={<Briefcase className="h-4 w-4" />} label="Designation" value={employee.designation} />
-            <Field icon={<Users className="h-4 w-4" />} label="Department" value={employee.department?.name ?? "—"} />
+            <Field
+              icon={<Briefcase className="h-4 w-4" />}
+              label="Designation"
+              value={employee.designation}
+            />
+            <Field
+              icon={<Users className="h-4 w-4" />}
+              label="Department"
+              value={employee.department?.name ?? "—"}
+            />
             <Field label="Team" value={employee.team?.name ?? "—"} />
             <Field label="Employment Type" value={employee.employment_type} />
             <Field
@@ -64,14 +80,21 @@ export default function EmployeeDetailPage() {
               value={new Date(employee.joining_date).toLocaleDateString()}
               mono
             />
-            <Field icon={<Mail className="h-4 w-4" />} label="Email" value={employee.user?.email ?? "—"} />
+            <Field
+              icon={<Mail className="h-4 w-4" />}
+              label="Email"
+              value={employee.user?.email ?? "—"}
+            />
             <Field label="Employee Code" value={employee.employee_code} mono />
             <Field label="Role" value={employee.user?.role?.name ?? "—"} />
             {canViewSalary && employee.salary != null && (
               <Field
                 icon={<DollarSign className="h-4 w-4" />}
                 label="Salary"
-                value={employee.salary.toLocaleString(undefined, { style: "currency", currency: "USD" })}
+                value={employee.salary.toLocaleString(undefined, {
+                  style: "currency",
+                  currency: "USD",
+                })}
                 mono
               />
             )}
@@ -80,12 +103,18 @@ export default function EmployeeDetailPage() {
 
         <Card>
           <CardHeader>
-            <CardTitle className="font-display text-base">Reporting Line</CardTitle>
+            <CardTitle className="font-display text-base">
+              Reporting Line
+            </CardTitle>
           </CardHeader>
           <CardContent className="space-y-3 text-sm">
             <div>
-              <p className="text-xs uppercase tracking-wide text-muted-foreground">Reports to</p>
-              <p className="font-medium">{employee.manager?.user?.full_name ?? "No manager assigned"}</p>
+              <p className="text-xs uppercase tracking-wide text-muted-foreground">
+                Reports to
+              </p>
+              <p className="font-medium">
+                {employee.manager?.user?.full_name ?? "No manager assigned"}
+              </p>
             </div>
           </CardContent>
         </Card>
@@ -106,7 +135,9 @@ export default function EmployeeDetailPage() {
                 className="reporting-line rounded-md border bg-card p-3 text-sm transition hover:bg-muted/50"
               >
                 <p className="font-medium">{report.user?.full_name ?? "—"}</p>
-                <p className="text-xs text-muted-foreground">{report.designation}</p>
+                <p className="text-xs text-muted-foreground">
+                  {report.designation}
+                </p>
               </Link>
             ))}
           </CardContent>

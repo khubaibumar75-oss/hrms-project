@@ -6,7 +6,7 @@ export async function logAudit(
   entityType: string,
   entityId: string | null,
   oldData: object | null,
-  newData: object | null
+  newData: object | null,
 ) {
   try {
     await AuditLog.create({
@@ -18,7 +18,6 @@ export async function logAudit(
       new_data: newData,
     });
   } catch (error) {
-    // Never let audit logging failures break the actual business operation
     console.error("Failed to write audit log:", error);
   }
 }

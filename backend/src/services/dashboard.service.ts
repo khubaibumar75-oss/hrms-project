@@ -24,12 +24,6 @@ export async function getDashboardSummary(userId: string) {
     where: { user_id: userId },
   });
 
-  /*
-  =====================================================
-  SUPER ADMIN / HR MANAGER
-  =====================================================
-  */
-
   if (role === "Super Admin" || role === "HR Manager") {
     const totalEmployees = await Employee.count();
 
@@ -71,12 +65,6 @@ export async function getDashboardSummary(userId: string) {
       })),
     };
   }
-
-  /*
-  =====================================================
-  EMPLOYEE
-  =====================================================
-  */
 
   if (!employee) {
     return {
@@ -140,12 +128,6 @@ export async function getDashboardSummary(userId: string) {
       pendingReviewsCount: pendingReviews,
     };
   }
-
-  /*
-  =====================================================
-  DEPARTMENT MANAGER
-  =====================================================
-  */
 
   const teamEmployees = await Employee.findAll({
     where: { manager_id: employee.id },

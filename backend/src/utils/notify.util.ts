@@ -6,7 +6,7 @@ export async function createNotification(
   message: string,
   type: string,
   entityType: string | null = null,
-  entityId: string | null = null
+  entityId: string | null = null,
 ) {
   try {
     await Notification.create({
@@ -19,7 +19,6 @@ export async function createNotification(
       entity_id: entityId,
     });
   } catch (error) {
-    // Never let notification creation failures break the actual business operation
     console.error("Failed to create notification:", error);
   }
 }

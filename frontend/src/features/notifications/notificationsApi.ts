@@ -32,7 +32,7 @@ export function useRecentNotifications() {
     queryKey: KEYS.recent,
     queryFn: fetchRecent,
     staleTime: 1000 * 30,
-    refetchInterval: 1000 * 60, // light polling — good enough without a websocket
+    refetchInterval: 1000 * 60,
   });
 }
 

@@ -421,7 +421,6 @@ export default function DashboardPage() {
     );
   }
 
-  // Extra safety: avoid rendering dashboards if backend response is malformed.
   if (data.scope !== "employee" && data.scope !== "manager") {
     return (
       <div className="flex h-screen items-center justify-center text-muted-foreground">

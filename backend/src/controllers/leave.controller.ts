@@ -137,29 +137,35 @@ export async function handleGetLeaveRequests(req: AuthRequest, res: Response) {
 
 export async function handleRequestLeave(req: AuthRequest, res: Response) {
   try {
-    const { leaveTypeId, startDate, endDate, reason } = req.body;
+    const {
+      leaveTypeId,
+      startDate,
+      endDate,
+      reason,
+      isScheduled,
+      scheduledAt,
+    } = req.body;
 
     const request = await requestLeave(
       req.user!.userId,
-
       leaveTypeId,
-
       startDate,
-
       endDate,
-
       reason,
+      isScheduled,
+      scheduledAt,
     );
 
     res.status(201).json({
       success: true,
-
       data: request,
+      message: isScheduled
+        ? "Leave request scheduled successfully."
+        : "Leave request submitted successfully.",
     });
   } catch (error: any) {
     res.status(error.status || 500).json({
       success: false,
-
       message: error.message || "Something went wrong",
     });
   }

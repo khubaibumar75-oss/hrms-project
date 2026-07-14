@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { Checkbox } from "@/components/ui/checkbox";
 import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Plus, Loader2, CalendarDays } from "lucide-react";
@@ -70,14 +71,19 @@ export default function LeaveRequestPage() {
     handleSubmit,
     control,
     reset,
+    watch,
     formState: { errors },
   } = useForm<LeaveRequestFormValues>({
     resolver: zodResolver(leaveRequestSchema),
     defaultValues: {
       leave_type_id: "",
+      start_date: "",
+      end_date: "",
+      reason: "",
+      isScheduled: false,
+      scheduled_at: "",
     },
   });
-
   const onSubmit = (values: LeaveRequestFormValues) => {
     createMutation.mutate(values, {
       onSuccess: () => {
@@ -87,7 +93,6 @@ export default function LeaveRequestPage() {
     });
   };
 
-  // ── History table ────────────────────────────────────────────────────
   const [page, setPage] = useState(1);
   const [search, setSearch] = useState("");
   const [sort, setSort] = useState<{
@@ -253,6 +258,45 @@ export default function LeaveRequestPage() {
                   </p>
                 )}
               </div>
+              <div className="space-y-4 rounded-md border p-4">
+                <div className="flex items-center space-x-2">
+                  <Controller
+                    name="isScheduled"
+                    control={control}
+                    render={({ field }) => (
+                      <Checkbox
+                        id="schedule-request"
+                        checked={field.value}
+                        onCheckedChange={(checked) =>
+                          field.onChange(checked === true)
+                        }
+                      />
+                    )}
+                  />
+
+                  <Label htmlFor="schedule-request">
+                    Schedule this leave request
+                  </Label>
+                </div>
+
+                {watch("isScheduled") && (
+                  <div className="space-y-2">
+                    <Label htmlFor="scheduled_at">Schedule Date & Time</Label>
+
+                    <Input
+                      id="scheduled_at"
+                      type="datetime-local"
+                      min={new Date().toISOString().slice(0, 16)}
+                      {...register("scheduled_at")}
+                    />
+
+                    <p className="text-xs text-muted-foreground">
+                      Your manager will receive this leave request at the
+                      selected date and time.
+                    </p>
+                  </div>
+                )}
+              </div>
 
               {createMutation.isError && (
                 <p className="text-sm text-destructive">
@@ -299,7 +343,6 @@ export default function LeaveRequestPage() {
         </div>
       )}
 
-      {/* History */}
       <div>
         <h2 className="mb-3 font-display text-lg font-semibold tracking-tight text-foreground">
           Your requests

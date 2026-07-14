@@ -8,9 +8,11 @@ export const createGoalSchema = z.object({
 });
 export type CreateGoalFormValues = z.infer<typeof createGoalSchema>;
 
-// SRS 2.4: every progress edit requires an explanatory comment, logged to audit.
 export const goalProgressSchema = z.object({
   progress: z.number().min(0).max(100),
-  comment: z.string().min(5, "Add a short note on what changed (at least 5 characters)").max(500),
+  comment: z
+    .string()
+    .min(5, "Add a short note on what changed (at least 5 characters)")
+    .max(500),
 });
 export type GoalProgressFormValues = z.infer<typeof goalProgressSchema>;

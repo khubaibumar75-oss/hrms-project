@@ -4,9 +4,9 @@ import type { AxiosError } from "axios";
 export const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
-      staleTime: 1000 * 60 * 2, // 2 min — HRMS data doesn't change second-to-second
+      staleTime: 1000 * 60 * 2,
       gcTime: 1000 * 60 * 10,
-      refetchOnWindowFocus: false, // avoid noisy refetches in an internal tool
+      refetchOnWindowFocus: false,
       refetchOnReconnect: true,
       retry: (failureCount, error) => {
         const status = (error as AxiosError)?.response?.status;

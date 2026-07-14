@@ -24,14 +24,11 @@ app.use(
       const allowedOrigins = [
         "http://localhost:5173",
 
-        // Production frontend
         "https://hrms-frontend-5empx56or-khubaibumar75-oss-projects.vercel.app",
 
-        // Environment variable fallback
         process.env.FRONTEND_URL,
       ].filter(Boolean);
 
-      // Allow requests without origin (Postman, curl, server-to-server)
       if (!origin) {
         return callback(null, true);
       }

@@ -5,7 +5,13 @@ import { Plus, Pencil, Building2, Users2, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   Dialog,
@@ -35,8 +41,6 @@ import type { Department, Team } from "@/types";
 
 const NO_MANAGER = "__none__";
 
-// ── Department dialog (create + edit) ────────────────────────────────────
-
 function DepartmentDialog({
   open,
   onOpenChange,
@@ -58,17 +62,23 @@ function DepartmentDialog({
     control,
     reset,
     formState: { errors },
-  } = useForm<DepartmentFormValues>({ resolver: zodResolver(departmentSchema) });
+  } = useForm<DepartmentFormValues>({
+    resolver: zodResolver(departmentSchema),
+  });
 
   const onSubmit = (values: DepartmentFormValues) => {
-    const manager_id = values.manager_id === NO_MANAGER ? undefined : values.manager_id;
+    const manager_id =
+      values.manager_id === NO_MANAGER ? undefined : values.manager_id;
     if (isEditing) {
       updateMutation.mutate(
         { id: department.id, ...values, manager_id },
-        { onSuccess: () => onOpenChange(false) }
+        { onSuccess: () => onOpenChange(false) },
       );
     } else {
-      createMutation.mutate({ ...values, manager_id }, { onSuccess: () => onOpenChange(false) });
+      createMutation.mutate(
+        { ...values, manager_id },
+        { onSuccess: () => onOpenChange(false) },
+      );
     }
   };
 
@@ -77,7 +87,10 @@ function DepartmentDialog({
       open={open}
       onOpenChange={(next) => {
         if (next) {
-          reset({ name: department?.name ?? "", manager_id: department?.manager_id ?? NO_MANAGER });
+          reset({
+            name: department?.name ?? "",
+            manager_id: department?.manager_id ?? NO_MANAGER,
+          });
         }
         onOpenChange(next);
       }}
@@ -85,17 +98,29 @@ function DepartmentDialog({
       <DialogContent>
         <form onSubmit={handleSubmit(onSubmit)} noValidate>
           <DialogHeader>
-            <DialogTitle>{isEditing ? "Edit department" : "New department"}</DialogTitle>
+            <DialogTitle>
+              {isEditing ? "Edit department" : "New department"}
+            </DialogTitle>
             <DialogDescription>
-              {isEditing ? department.name : "Add a new department to the org structure."}
+              {isEditing
+                ? department.name
+                : "Add a new department to the org structure."}
             </DialogDescription>
           </DialogHeader>
 
           <div className="space-y-4 py-2">
             <div className="space-y-1.5">
               <Label htmlFor="dept-name">Name</Label>
-              <Input id="dept-name" placeholder="e.g. Engineering" {...register("name")} />
-              {errors.name && <p className="text-xs text-destructive">{errors.name.message}</p>}
+              <Input
+                id="dept-name"
+                placeholder="e.g. Engineering"
+                {...register("name")}
+              />
+              {errors.name && (
+                <p className="text-xs text-destructive">
+                  {errors.name.message}
+                </p>
+              )}
             </div>
 
             <div className="space-y-1.5">
@@ -104,12 +129,17 @@ function DepartmentDialog({
                 name="manager_id"
                 control={control}
                 render={({ field }) => (
-                  <Select onValueChange={field.onChange} value={field.value ?? NO_MANAGER}>
+                  <Select
+                    onValueChange={field.onChange}
+                    value={field.value ?? NO_MANAGER}
+                  >
                     <SelectTrigger id="dept-manager">
                       <SelectValue placeholder="No manager assigned" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value={NO_MANAGER}>No manager assigned</SelectItem>
+                      <SelectItem value={NO_MANAGER}>
+                        No manager assigned
+                      </SelectItem>
                       {options?.map((opt) => (
                         <SelectItem key={opt.id} value={opt.id}>
                           {opt.user.full_name} · {opt.employee_code}
@@ -189,12 +219,14 @@ function DepartmentsTab() {
         </div>
       )}
 
-      <DepartmentDialog open={dialogOpen} onOpenChange={setDialogOpen} department={editing} />
+      <DepartmentDialog
+        open={dialogOpen}
+        onOpenChange={setDialogOpen}
+        department={editing}
+      />
     </div>
   );
 }
-
-// ── Team dialog (create + edit) ──────────────────────────────────────────
 
 function TeamDialog({
   open,
@@ -224,9 +256,15 @@ function TeamDialog({
   const onSubmit = (values: TeamFormValues) => {
     const lead_id = values.lead_id === NO_MANAGER ? undefined : values.lead_id;
     if (isEditing) {
-      updateMutation.mutate({ id: team.id, ...values, lead_id }, { onSuccess: () => onOpenChange(false) });
+      updateMutation.mutate(
+        { id: team.id, ...values, lead_id },
+        { onSuccess: () => onOpenChange(false) },
+      );
     } else {
-      createMutation.mutate({ ...values, lead_id }, { onSuccess: () => onOpenChange(false) });
+      createMutation.mutate(
+        { ...values, lead_id },
+        { onSuccess: () => onOpenChange(false) },
+      );
     }
   };
 
@@ -248,14 +286,24 @@ function TeamDialog({
         <form onSubmit={handleSubmit(onSubmit)} noValidate>
           <DialogHeader>
             <DialogTitle>{isEditing ? "Edit team" : "New team"}</DialogTitle>
-            <DialogDescription>{isEditing ? team.name : "Add a team under a department."}</DialogDescription>
+            <DialogDescription>
+              {isEditing ? team.name : "Add a team under a department."}
+            </DialogDescription>
           </DialogHeader>
 
           <div className="space-y-4 py-2">
             <div className="space-y-1.5">
               <Label htmlFor="team-name">Name</Label>
-              <Input id="team-name" placeholder="e.g. Platform Infrastructure" {...register("name")} />
-              {errors.name && <p className="text-xs text-destructive">{errors.name.message}</p>}
+              <Input
+                id="team-name"
+                placeholder="e.g. Platform Infrastructure"
+                {...register("name")}
+              />
+              {errors.name && (
+                <p className="text-xs text-destructive">
+                  {errors.name.message}
+                </p>
+              )}
             </div>
 
             <div className="space-y-1.5">
@@ -279,7 +327,9 @@ function TeamDialog({
                 )}
               />
               {errors.department_id && (
-                <p className="text-xs text-destructive">{errors.department_id.message}</p>
+                <p className="text-xs text-destructive">
+                  {errors.department_id.message}
+                </p>
               )}
             </div>
 
@@ -289,12 +339,17 @@ function TeamDialog({
                 name="lead_id"
                 control={control}
                 render={({ field }) => (
-                  <Select onValueChange={field.onChange} value={field.value ?? NO_MANAGER}>
+                  <Select
+                    onValueChange={field.onChange}
+                    value={field.value ?? NO_MANAGER}
+                  >
                     <SelectTrigger id="team-lead">
                       <SelectValue placeholder="No lead assigned" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value={NO_MANAGER}>No lead assigned</SelectItem>
+                      <SelectItem value={NO_MANAGER}>
+                        No lead assigned
+                      </SelectItem>
                       {options?.map((opt) => (
                         <SelectItem key={opt.id} value={opt.id}>
                           {opt.user.full_name} · {opt.employee_code}
@@ -323,7 +378,7 @@ function TeamsTab() {
   const { data: departments } = useDepartmentsAdmin();
   const [departmentFilter, setDepartmentFilter] = useState<string>("all");
   const { data: teams, isLoading } = useTeamsAdmin(
-    departmentFilter === "all" ? undefined : departmentFilter
+    departmentFilter === "all" ? undefined : departmentFilter,
   );
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editing, setEditing] = useState<Team | null>(null);
@@ -381,12 +436,14 @@ function TeamsTab() {
             <tbody className="divide-y divide-border">
               {teams.map((team) => (
                 <tr key={team.id}>
-                  <td className="px-4 py-3 font-medium text-foreground">{team.name}</td>
-                  <td className="px-4 py-3 text-muted-foreground">
-                    {departments?.find((d) => d.id === team.department_id)?.name ?? "—"}
+                  <td className="px-4 py-3 font-medium text-foreground">
+                    {team.name}
                   </td>
                   <td className="px-4 py-3 text-muted-foreground">
-                    {/* lead name comes through if your GET /teams embeds it; falls back gracefully otherwise */}
+                    {departments?.find((d) => d.id === team.department_id)
+                      ?.name ?? "—"}
+                  </td>
+                  <td className="px-4 py-3 text-muted-foreground">
                     {(team as any).lead?.user?.full_name ?? "—"}
                   </td>
                   <td className="px-4 py-3 text-right">
@@ -405,7 +462,12 @@ function TeamsTab() {
         </div>
       )}
 
-      <TeamDialog open={dialogOpen} onOpenChange={setDialogOpen} team={editing} departments={departments ?? []} />
+      <TeamDialog
+        open={dialogOpen}
+        onOpenChange={setDialogOpen}
+        team={editing}
+        departments={departments ?? []}
+      />
     </div>
   );
 }
@@ -418,7 +480,8 @@ export default function OrgStructurePage() {
           Org structure
         </h1>
         <p className="mt-1.5 text-sm text-muted-foreground">
-          Manage departments and teams — this shapes the reporting chains used across the app.
+          Manage departments and teams — this shapes the reporting chains used
+          across the app.
         </p>
       </div>
 

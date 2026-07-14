@@ -171,7 +171,6 @@ export default function ClockInOutPage() {
     },
   ];
 
-  // HR / Admin: no attendance access at all
   if (!canAccessAttendance) {
     return (
       <div className="space-y-8">
@@ -204,7 +203,6 @@ export default function ClockInOutPage() {
         </p>
       </div>
 
-      {/* Today's status card */}
       <div className="rounded-xl border border-border bg-card p-6 sm:p-8">
         <div className="flex flex-col items-center gap-6 sm:flex-row sm:items-center sm:justify-between">
           <div className="text-center sm:text-left">
@@ -344,7 +342,6 @@ export default function ClockInOutPage() {
         )}
       </div>
 
-      {/* History */}
       <div>
         <h2 className="mb-3 font-display text-lg font-semibold tracking-tight text-foreground">
           History
