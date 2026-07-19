@@ -10,52 +10,46 @@ import {
 } from "../models";
 import { logAudit } from "../utils/auditLogger.util";
 import { createNotification } from "../utils/notify.util";
-
 export async function getHRLeaveApprovals(
   page: number,
   limit: number,
   search: string,
 ) {
   const where: any = {
+    status: "Pending",
     manager_status: "Approved",
     hr_status: "Pending",
+    [Op.and]: [
+      { is_scheduled: false },
+      { status: "Pending" },
+      {
+        [Op.or]: [
+          { scheduled_at: null },
+          { scheduled_at: { [Op.lte]: new Date() } },
+        ],
+      },
+    ],
   };
 
   if (search) {
-    where.reason = {
-      [Op.iLike]: `%${search}%`,
-    };
+    where.reason = { [Op.iLike]: `%${search}%` };
   }
+
+  console.log("========== HR WHERE ==========");
+  console.dir(where, { depth: null });
 
   const { rows, count } = await LeaveRequest.findAndCountAll({
     where,
-
     include: [
-      {
-        model: Employee,
-        include: [
-          {
-            model: User,
-          },
-        ],
-      },
-      {
-        model: LeaveType,
-      },
+      { model: Employee, include: [{ model: User }] },
+      { model: LeaveType },
     ],
-
     order: [["created_at", "DESC"]],
-
     limit,
     offset: (page - 1) * limit,
   });
 
-  return {
-    data: rows,
-    total: count,
-    page,
-    limit,
-  };
+  return { data: rows, total: count, page, limit };
 }
 
 export async function getLeaveApprovals(
@@ -64,41 +58,40 @@ export async function getLeaveApprovals(
   limit: number,
   search: string,
 ) {
-  const manager = await Employee.findOne({
-    where: { user_id: managerUserId },
-  });
-
-  if (!manager) {
-    throw {
-      status: 404,
-      message: "Manager profile not found",
-    };
-  }
+  const manager = await Employee.findOne({ where: { user_id: managerUserId } });
+  if (!manager) throw { status: 404, message: "Manager profile not found" };
 
   const where: any = {
+    status: "Pending",
     manager_status: "Pending",
+    // Scheduled leaves should not appear until cron releases them.
+    is_scheduled: false,
+    // Extra guard in case some rows still have scheduled_at populated.
+    [Op.or]: [
+      { scheduled_at: null },
+      { scheduled_at: { [Op.lte]: new Date() } },
+    ],
   };
 
   if (search) {
-    where.reason = {
-      [Op.iLike]: `%${search}%`,
-    };
+    where.reason = { [Op.iLike]: `%${search}%` };
   }
+  console.log("========== MANAGER WHERE ==========");
+  console.dir(where, { depth: null });
 
   const { rows, count } = await LeaveRequest.findAndCountAll({
+    logging: console.log, // <-- Add this
+
     where,
 
     include: [
       {
         model: Employee,
+        required: true,
         where: {
           manager_id: manager.get("id"),
         },
-        include: [
-          {
-            model: User,
-          },
-        ],
+        include: [{ model: User }],
       },
       {
         model: LeaveType,
@@ -108,15 +101,11 @@ export async function getLeaveApprovals(
     order: [["created_at", "DESC"]],
 
     limit,
+
     offset: (page - 1) * limit,
   });
 
-  return {
-    data: rows,
-    total: count,
-    page,
-    limit,
-  };
+  return { data: rows, total: count, page, limit };
 }
 
 async function getRoleName(userId: string): Promise<string> {
@@ -246,6 +235,11 @@ export async function requestLeave(
     scheduledAt,
     now: new Date().toISOString(),
   });
+  console.log("========== REQUEST ==========");
+  console.log("scheduledAt from frontend:", scheduledAt);
+  console.log("new Date(scheduledAt):", new Date(scheduledAt!));
+  console.log("ISO:", new Date(scheduledAt!).toISOString());
+  console.log("=============================");
 
   const employee = await Employee.findOne({
     where: {
@@ -319,7 +313,10 @@ export async function requestLeave(
       message: "Insufficient leave balance",
     };
   }
-
+  console.log("SERVICE BEFORE CREATE:", {
+    isScheduled,
+    scheduledAt,
+  });
   const request = await LeaveRequest.create({
     employee_id: employee.get("id"),
 
@@ -333,7 +330,7 @@ export async function requestLeave(
 
     reason,
 
-    status: "Pending",
+    status: isScheduled ? "Scheduled" : "Pending",
 
     manager_status: "Pending",
 
@@ -344,6 +341,13 @@ export async function requestLeave(
     scheduled_at: isScheduled ? scheduledAt : null,
   });
 
+  console.log("========== LEAVE DEBUG ==========");
+  console.log("isScheduled:", isScheduled, typeof isScheduled);
+  console.log("manager_id:", employee.get("manager_id"));
+  console.log("=================================");
+
+  // Only notify manager immediately for NON-scheduled requests.
+  // Scheduled leaves should reach manager only when the cron releases them.
   if (!isScheduled && employee.get("manager_id")) {
     const manager = await Employee.findByPk(
       employee.get("manager_id") as string,
@@ -387,6 +391,15 @@ export async function managerReview(
     throw {
       status: 404,
       message: "Leave request not found",
+    };
+  }
+
+  const scheduledAt = request.get("scheduled_at") as Date | null;
+
+  if (request.get("is_scheduled") && scheduledAt && scheduledAt > new Date()) {
+    throw {
+      status: 400,
+      message: "This leave request is not available for review yet.",
     };
   }
 

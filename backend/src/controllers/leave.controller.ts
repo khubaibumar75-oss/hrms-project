@@ -137,6 +137,9 @@ export async function handleGetLeaveRequests(req: AuthRequest, res: Response) {
 
 export async function handleRequestLeave(req: AuthRequest, res: Response) {
   try {
+    console.log("========== LEAVE REQUEST HIT ==========");
+    console.log(req.body);
+
     const {
       leaveTypeId,
       startDate,

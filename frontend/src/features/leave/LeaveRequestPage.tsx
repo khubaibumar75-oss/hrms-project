@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Checkbox } from "@/components/ui/checkbox";
 import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+
 import {
   Select,
   SelectContent,
@@ -72,6 +73,7 @@ export default function LeaveRequestPage() {
     control,
     reset,
     watch,
+    setValue,
     formState: { errors },
   } = useForm<LeaveRequestFormValues>({
     resolver: zodResolver(leaveRequestSchema),
@@ -84,7 +86,18 @@ export default function LeaveRequestPage() {
       scheduled_at: "",
     },
   });
+
+  const isScheduled = watch("isScheduled");
+
+  useEffect(() => {
+    if (!isScheduled) {
+      setValue("scheduled_at", "");
+    }
+  }, [isScheduled, setValue]);
+
   const onSubmit = (values: LeaveRequestFormValues) => {
+    console.log("FINAL FORM VALUES:", values);
+
     createMutation.mutate(values, {
       onSuccess: () => {
         reset();
@@ -267,9 +280,9 @@ export default function LeaveRequestPage() {
                       <Checkbox
                         id="schedule-request"
                         checked={field.value}
-                        onCheckedChange={(checked) =>
-                          field.onChange(checked === true)
-                        }
+                        onCheckedChange={(checked) => {
+                          field.onChange(checked === true);
+                        }}
                       />
                     )}
                   />
@@ -286,7 +299,11 @@ export default function LeaveRequestPage() {
                     <Input
                       id="scheduled_at"
                       type="datetime-local"
-                      min={new Date().toISOString().slice(0, 16)}
+                      min={new Date(
+                        Date.now() - new Date().getTimezoneOffset() * 60000,
+                      )
+                        .toISOString()
+                        .slice(0, 16)}
                       {...register("scheduled_at")}
                     />
 

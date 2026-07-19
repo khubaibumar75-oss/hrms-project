@@ -53,6 +53,14 @@ app.use(
 
 app.use(express.json());
 
+app.use((req, res, next) => {
+  console.log("🔥 INCOMING REQUEST:", req.method, req.originalUrl);
+  console.log("🔥 BODY:", req.body);
+  next();
+});
+
+app.use(cookieParser());
+
 app.use(cookieParser());
 
 app.use(morgan("dev"));

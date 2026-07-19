@@ -114,9 +114,10 @@ async function createLeaveRequestRequest(payload: LeaveRequestFormValues) {
       endDate: payload.end_date,
       reason: payload.reason,
 
-      // New fields
       isScheduled: payload.isScheduled ?? false,
-      scheduledAt: payload.scheduled_at || null,
+      scheduledAt: payload.scheduled_at
+        ? new Date(payload.scheduled_at).toISOString()
+        : null,
     },
   );
 
@@ -124,8 +125,28 @@ async function createLeaveRequestRequest(payload: LeaveRequestFormValues) {
 }
 
 export function useCreateLeaveRequest() {
+  const queryClient = useQueryClient();
+
   return useMutation({
     mutationFn: createLeaveRequestRequest,
+
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: ["my-leave-requests"],
+      });
+
+      queryClient.invalidateQueries({
+        queryKey: ["leave-balances"],
+      });
+
+      queryClient.invalidateQueries({
+        queryKey: ["leave-approvals"],
+      });
+
+      queryClient.invalidateQueries({
+        queryKey: ["hr-leave-approvals"],
+      });
+    },
   });
 }
 
@@ -172,6 +193,13 @@ export function useLeaveApprovals(args: ApprovalArgs) {
   return useQuery({
     queryKey: ["leave-approvals", args],
     queryFn: () => getLeaveApprovalsRequest(args),
+
+    staleTime: 0,
+
+    refetchOnWindowFocus: true,
+    refetchOnMount: true,
+
+    refetchInterval: 30000, // every 30 seconds
   });
 }
 
